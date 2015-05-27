@@ -18,28 +18,52 @@
 ##   Daniel Izquierdo-Cortazar <dizquierdo@bitergia.com>
 ##
 
+
+import pandas
+
 class SCM(object):
-   """ Source Code Management class to deal with source code activity
+    """ Source Code Management class to deal with source code activity
        measurements.
-   """
+    """
 
-PERIOD_WEEK = "week"
-PERIOD_MONTH = "month"
-PERIOD_YEAR = "year"
+    PERIOD_WEEK = "week"
+    PERIOD_MONTH = "month"
+    PERIOD_YEAR = "year"
 
+    # Constants used to check what metrics are needed to be counted and
+    # what metrics are needed to be sized.
+    # When aggregating values, we're interested in counting distinct 
+    # companies, but when aggregating added_lines, we're interested in 
+    # adding all of them.
 
-    def __init__(self):
+    METRICS_SUM = ["added_lines", "removed_lines", "files"]
+
+    def __init__(self, dataset):
         """ This class expects either a database connection or a pandas dataframe
 
         If a pandas dataframe is not provided, then, this class needs a database
         connection.
         """
 
+        self.data = dataset
+        self.metrics = self.data.columns.values.tolist()
+
     def agg(self, metrics):
         """ This returns the selected metrics number for the filtered dataset
         """
 
-    def ts(self, metrics, period):
+        data = {}
+        for metric in metrics:
+            if metric in SCM.METRICS_SUM:
+                data[metric] = self.data[metric].sum()
+            else:
+                # Counting unique values of the metric
+                # eg: counting unique authors or companies
+                data[metric] = self.data[metric].nunique()
+
+        return data
+
+    def ts(self, period):
         """ This returns the selected metrics in a timeseries format.
 
         This analysis is a specialization of the group method. In this
@@ -47,7 +71,7 @@ PERIOD_YEAR = "year"
         week, etc.
         """
 
-    def group(self, metrics, groups):
+    def group(self, groups):
         """ This group the selected 'metrics' into the specified 'groups'
 
         This method does not check if the group order makes sense.
@@ -56,9 +80,35 @@ PERIOD_YEAR = "year"
         Grouping commits by author makes sense, but not the other way around.
         However, if authors are grouped by commit, this method would return
         the whole list given that there would not be any actual group action.
+
+        The order of the group is important. Data will be returned following
+        that order.
         """
+
+        data = {}
+
+        # checking all of the groups exist
+        for group in groups:
+            if group not in self.metrics:
+                raise Exception
+
+        # grouping data by the selected groups in the specified order
+        grouped = self.data.groupby(groups)
+
+        aggregation = {}
+        for metric in self.metrics:
+            if metric not in groups:
+                # if metric is in groups, it does not make sense this aggregation
+                if metric in SCM.METRICS_SUM:
+                    aggregation[metric] = sum
+                else:
+                    aggregation[metric] = pandas.Series.nunique
+
+        return grouped.aggregate(aggregation)
 
     def metrics(self):
         """ This returns a list with available metrics
         """
+
+        return self.metrics
 
