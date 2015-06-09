@@ -106,9 +106,4 @@ class SCM(object):
 
         return grouped.aggregate(aggregation)
 
-    def metrics(self):
-        """ This returns a list with available metrics
-        """
-
-        return self.metrics
 
