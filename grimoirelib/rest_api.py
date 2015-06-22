@@ -23,6 +23,7 @@ from flask import Flask, jsonify
 from flask_restful import Resource, Api
 
 from grimoirelib.db.scm_data import SCMData
+from grimoirelib.db.scr_data import SCRData
 
 app = Flask(__name__)
 api = Api(app)
@@ -30,22 +31,45 @@ api = Api(app)
 scm_object = SCMData()
 scm_data = scm_object.get_data()
 
-class Metrics(Resource):
+scr_object = SCRData()
+scr_data = scr_object.get_data()
+
+## SCM metrics
+class SCMMetrics(Resource):
     def get(self):
         return jsonify(metrics=scm_data.metrics)
 
-class Raw(Resource):
+class SCMRaw(Resource):
     def get(self):
         return jsonify(raw=scm_data.data)
 
-class Agg(Resource):
+class SCMAgg(Resource):
     def get(self):
         return jsonify(agg=scm_data.agg(scm_data.metrics))
 
 
-api.add_resource(Metrics, "/metrics")
-api.add_resource(Raw, "/raw")
-api.add_resource(Agg, "/agg")
+## SCR metrics
+class SCRMetrics(Resource):
+    def get(self):
+        return jsonify(metrics=scr_data.metrics)
+
+class SCRRaw(Resource):
+    def get(self):
+        return jsonify(raw=scr_data.data)
+
+class SCRAgg(Resource):
+    def get(self):
+        return jsonify(agg=scr_data.agg(scr_data.metrics))
+
+
+api.add_resource(SCMMetrics, "/metrics/scm/")
+api.add_resource(SCMRaw, "/raw/scm/")
+api.add_resource(SCMAgg, "/agg/scm/")
+
+
+api.add_resource(SCRMetrics, "/metrics/scr/")
+api.add_resource(SCRRaw, "/raw/scr/")
+api.add_resource(SCRAgg, "/agg/scr/")
 
 if __name__ == '__main__':
     app.run(debug=True)

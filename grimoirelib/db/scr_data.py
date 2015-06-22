@@ -22,17 +22,17 @@
 import MySQLdb
 import pandas
 
-from grimoirelib.data_handler.scm import SCM
+from grimoirelib.data_handler.scr import SCR
 
-class SCMData(object):
-    """ Basic class to deal with SCM data
+class SCRData(object):
+    """ Basic class to deal with SCR data
     """
 
     def _connect(self):
         user = "root"
         password = ""
         host = "localhost"
-        db = "eclipse_source_code_20141127"
+        db = "wikimedia_gerrit_20150621"
 
         try:
             db = MySQLdb.connect(user = user, passwd = password, db = db)
@@ -53,22 +53,23 @@ class SCMData(object):
 
     def __init__(self):
         db, cursor = self._connect()
-        query = """select cl.added,
-                       cl.removed,
-                       s.author_date,
-                       s.author_id,
-                       s.repository_id,
-                       upc.company_id
-                   from commits_lines cl,
-                        scmlog s,
-                        people_upeople pup,
-                        upeople_companies upc
-                   where cl.commit_id = s.id and
-                        s.author_id=pup.people_id and
-                        pup.upeople_id = upc.upeople_id limit 10"""
+        query = """select i.id as issue_id,
+                          i.tracker_id as tracker,
+                          i.type as issue_type,
+                          i.status as issue_status,
+                          i.resolution as issue_resolution,
+                          i.priority as issue_priority,
+                          i.submitted_by as submitter,
+                          enr.organization_id as organization
+                   from issues i
+                   left join  people_uidentities pup
+                        on i.submitted_by = pup.people_id
+                   left join wikimedia_identities_20150621.enrollments enr
+                        on pup.uuid = enr.uuid
+                """
 
         self.data = self._execute_query(cursor, query)
 
     def get_data(self):
-        return SCM(pandas.DataFrame(list(self.data), columns=["added_lines", "removed_lines", "date", "author", "repository", "company"]))
+        return SCR(pandas.DataFrame(list(self.data), columns=["issue_id", "tracker", "issue_type", "issue_status", "issue_resolution", "issue_priority", "submitter", "organization"]))
 
