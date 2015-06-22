@@ -22,7 +22,7 @@
 import MySQLdb
 import pandas
 
-from scm import SCM
+from grimoirelib.data_handler.scm import SCM
 
 class SCMData(object):
     """ Basic class to deal with SCM data

@@ -22,7 +22,7 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
 
-from scm_data import SCMData
+from grimoirelib.db.scm_data import SCMData
 
 app = Flask(__name__)
 api = Api(app)
