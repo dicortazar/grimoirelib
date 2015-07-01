@@ -24,6 +24,8 @@ import pandas
 
 from grimoirelib.data_handler.scm import SCM
 
+from grimoirelib_settings.settings import Settings
+
 class SCMData(object):
     """ Basic class to deal with SCM data
     """
@@ -56,8 +58,8 @@ class SCMData(object):
         query = """ SELECT column_name
                     FROM information_schema.columns
                     WHERE table_schema = '%s' AND
-                          table_name = 'scm_metadata'
-                """ % (database)
+                          table_name = '%s'
+                """ % (database, Settings.SCM_METATABLE_NAME)
 
         self.columns = []
         columns_string = ""
@@ -70,7 +72,7 @@ class SCMData(object):
             columns_string = columns_string + column[0]
 
         print columns_string
-        query = "select %s from scm_metadata" % (columns_string)
+        query = "select %s from %s" % (columns_string, Settings.SCM_METATABLE_NAME)
         self.data = self._execute_query(cursor, query)
 
     def get_data(self):
