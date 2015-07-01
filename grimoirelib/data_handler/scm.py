@@ -72,6 +72,8 @@ class SCM(object):
         week, etc.
         """
 
+        return self.data.set_index("date").resample("M", how=pandas.Series.sum)
+
     def group(self, groups):
         """ This group the selected 'metrics' into the specified 'groups'
 

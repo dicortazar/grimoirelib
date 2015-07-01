@@ -48,6 +48,10 @@ class SCMAgg(Resource):
     def get(self):
         return jsonify(agg=scm_data.agg(scm_data.metrics))
 
+class SCMTS(Resource):
+    def get(self):
+        return jsonify(ts=scm_data.ts(scm_data.metrics))
+
 
 ## SCR metrics
 class SCRMetrics(Resource):
@@ -66,6 +70,7 @@ class SCRAgg(Resource):
 api.add_resource(SCMMetrics, "/metrics/scm/")
 api.add_resource(SCMRaw, "/raw/scm/")
 api.add_resource(SCMAgg, "/agg/scm/")
+api.add_resource(SCMTS, "/ts/scm/")
 
 
 api.add_resource(SCRMetrics, "/metrics/scr/")
