@@ -28,11 +28,11 @@ class SCMData(object):
     """ Basic class to deal with SCM data
     """
 
-    def _connect(self):
-        user = "root"
-        password = ""
+    def _connect(self, user, password, database):
+        user = user
+        password = password
         host = "localhost"
-        db = "eclipse_source_code_20141127"
+        db = database
 
         try:
             db = MySQLdb.connect(user = user, passwd = password, db = db)
@@ -51,24 +51,28 @@ class SCMData(object):
             return []
 
 
-    def __init__(self):
-        db, cursor = self._connect()
-        query = """select cl.added,
-                       cl.removed,
-                       s.author_date,
-                       s.author_id,
-                       s.repository_id,
-                       upc.company_id
-                   from commits_lines cl,
-                        scmlog s,
-                        people_upeople pup,
-                        upeople_companies upc
-                   where cl.commit_id = s.id and
-                        s.author_id=pup.people_id and
-                        pup.upeople_id = upc.upeople_id limit 10"""
+    def __init__(self, user, password, database):
+        db, cursor = self._connect(user, password, database)
+        query = """ SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_schema = '%s' AND
+                          table_name = 'scm_metadata'
+                """ % (database)
 
+        self.columns = []
+        columns_string = ""
+        table_columns = self._execute_query(cursor, query)
+        print table_columns
+        for column in table_columns:
+            self.columns.append(column[0])
+            if len(columns_string) > 0:
+                columns_string = columns_string + ","
+            columns_string = columns_string + column[0]
+
+        print columns_string
+        query = "select %s from scm_metadata" % (columns_string)
         self.data = self._execute_query(cursor, query)
 
     def get_data(self):
-        return SCM(pandas.DataFrame(list(self.data), columns=["added_lines", "removed_lines", "date", "author", "repository", "company"]))
+        return SCM(pandas.DataFrame(list(self.data), columns=self.columns))
 

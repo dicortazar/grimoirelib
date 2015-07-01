@@ -28,11 +28,12 @@ from grimoirelib.db.scr_data import SCRData
 app = Flask(__name__)
 api = Api(app)
 
-scm_object = SCMData()
+
+scm_object = SCMData("root", "", "wikimedia_git_20150629")
 scm_data = scm_object.get_data()
 
-scr_object = SCRData()
-scr_data = scr_object.get_data()
+#scr_object = SCRData()
+#scr_data = scr_object.get_data()
 
 ## SCM metrics
 class SCMMetrics(Resource):

@@ -36,7 +36,8 @@ class SCM(object):
     # companies, but when aggregating added_lines, we're interested in 
     # adding all of them.
 
-    METRICS_SUM = ["added_lines", "removed_lines", "files"]
+    METRICS_SUM = ["added_lines", "removed_lines"]
+    METRICS_BOOLEAN = ["is_bot", "is_merge"]
 
     def __init__(self, dataset):
         """ This class expects either a database connection or a pandas dataframe
