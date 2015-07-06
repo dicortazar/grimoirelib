@@ -42,7 +42,7 @@ class SCMMetrics(Resource):
 
 class SCMRaw(Resource):
     def get(self):
-        return jsonify(raw=scm_data.data)
+        return jsonify(raw=scm_data.raw())
 
 class SCMAgg(Resource):
     def get(self):
@@ -50,7 +50,7 @@ class SCMAgg(Resource):
 
 class SCMTS(Resource):
     def get(self):
-        return jsonify(ts=scm_data.ts(scm_data.metrics))
+        return jsonify(ts=scm_data.ts(scm_data.PERIOD_MONTH, scm_data.metrics))
 
 
 ## SCR metrics

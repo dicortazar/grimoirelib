@@ -64,7 +64,7 @@ class SCM(object):
 
         return data
 
-    def ts(self, period):
+    def ts(self, period, metrics):
         """ This returns the selected metrics in a timeseries format.
 
         This analysis is a specialization of the group method. In this
@@ -72,7 +72,23 @@ class SCM(object):
         week, etc.
         """
 
-        return self.data.set_index("date").resample("M", how=pandas.Series.sum)
+        aggregation = {} # dictionary of metric and its function to apply
+        for metric in metrics:
+            if metric == 'date':
+                continue
+            if metric in SCM.METRICS_SUM:
+                aggregation[metric] = sum
+            else:
+                aggregation[metric] = pandas.Series.nunique
+
+        timeserie = self.data.set_index("date").resample("M", how=aggregation)
+
+        data = {}
+        metrics = timeserie.columns.values.tolist()
+        for metric in metrics:
+            data[metric] = list(timeserie[metric])
+
+        return data
 
     def group(self, groups):
         """ This group the selected 'metrics' into the specified 'groups'
@@ -109,4 +125,13 @@ class SCM(object):
 
         return grouped.aggregate(aggregation)
 
+    def raw(self):
+        """ This method returns the raw values of self.data in JSON format
+        """
+
+        data = {}
+        for metric in self.metrics:
+            data[metric] = list(self.data[metric])
+
+        return data
 
