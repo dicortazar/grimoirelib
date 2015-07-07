@@ -124,13 +124,24 @@ class SCM(object):
                     aggregation[metric] = pandas.Series.nunique
 
         result = grouped.aggregate(aggregation)
-
+        #return dict(list(grouped))
+        metrics = result.columns.tolist()
         data = {}
-        metrics = result.columns.values.tolist()
+        data["grouped"] = []
         for metric in metrics:
-            if metric == "date":
-                continue
-            data[metric] = list(result[metric])
+            data[metric] = []
+
+        for row in result.itertuples():
+            cont = 0
+            data["grouped"].append(row[cont])
+            cont = cont + 1
+            for metric in metrics:
+                if metric == "date":
+                    cont = cont + 1
+                    continue
+                data[metric].append(row[cont])
+                cont = cont + 1
+
         return data
 
     def raw(self):
