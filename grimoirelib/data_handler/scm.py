@@ -55,7 +55,13 @@ class SCM(object):
 
         data = {}
         for metric in metrics:
+            print metric
+            print SCM.METRICS_SUM
+            print SCM.METRICS_BOOLEAN
             if metric in SCM.METRICS_SUM:
+                data[metric] = self.data[metric].sum()
+            elif metric in SCM.METRICS_BOOLEAN:
+                # eg: this add all of the True fields
                 data[metric] = self.data[metric].sum()
             else:
                 # Counting unique values of the metric
@@ -77,6 +83,8 @@ class SCM(object):
             if metric == 'date':
                 continue
             if metric in SCM.METRICS_SUM:
+                aggregation[metric] = sum
+            if metric in SCM.METRICS_BOOLEAN:
                 aggregation[metric] = sum
             else:
                 aggregation[metric] = pandas.Series.nunique
@@ -119,6 +127,8 @@ class SCM(object):
             if metric not in groups:
                 # if metric is in groups, it does not make sense this aggregation
                 if metric in SCM.METRICS_SUM:
+                    aggregation[metric] = sum
+                if metric in SCM.METRICS_BOOLEAN:
                     aggregation[metric] = sum
                 else:
                     aggregation[metric] = pandas.Series.nunique
