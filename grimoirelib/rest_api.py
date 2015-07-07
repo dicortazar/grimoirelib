@@ -70,6 +70,9 @@ class SCMCountries(Resource):
     def get(self):
         return scm_object.countries()
 
+class SCMGroupsAgg(Resource):
+    def get(self, metric1, metric2):
+        return scm_data.group([metric1, metric2])
 
 ## SCR metrics
 class SCRMetrics(Resource):
@@ -93,6 +96,7 @@ api.add_resource(SCMPeople, "/scm/people/")
 api.add_resource(SCMOrganizations, "/scm/organizations/")
 api.add_resource(SCMRepositories, "/scm/repositories/")
 api.add_resource(SCMCountries, "/scm/countries/")
+api.add_resource(SCMGroupsAgg, "/scm/<metric1>/<metric2>/agg/")
 
 
 api.add_resource(SCRMetrics, "/metrics/scr/")
