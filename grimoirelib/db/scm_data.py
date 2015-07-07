@@ -37,7 +37,7 @@ class SCMData(object):
         db = database
 
         try:
-            db = MySQLdb.connect(user = user, passwd = password, db = db)
+            db = MySQLdb.connect(user = user, passwd = password, db = db, charset='utf8')
             return db, db.cursor()
         except:
             logging.error("Database connection error")
@@ -54,7 +54,7 @@ class SCMData(object):
 
 
     def __init__(self, user, password, database):
-        db, cursor = self._connect(user, password, database)
+        self.db, self.cursor = self._connect(user, password, database)
         query = """ SELECT column_name
                     FROM information_schema.columns
                     WHERE table_schema = '%s' AND
@@ -63,7 +63,7 @@ class SCMData(object):
 
         self.columns = []
         columns_string = ""
-        table_columns = self._execute_query(cursor, query)
+        table_columns = self._execute_query(self.cursor, query)
         print table_columns
         for column in table_columns:
             self.columns.append(column[0])
@@ -73,8 +73,24 @@ class SCMData(object):
 
         print columns_string
         query = "select %s from %s" % (columns_string, Settings.SCM_METATABLE_NAME)
-        self.data = self._execute_query(cursor, query)
+        self.data = self._execute_query(self.cursor, query)
 
     def get_data(self):
         return SCM(pandas.DataFrame(list(self.data), columns=self.columns))
+
+    def people(self):
+        query = """ SELECT p.id as author,
+                           p.name as name
+                    FROM people p
+                """
+        people = self._execute_query(self.cursor, query)
+        data = {}
+        data["author"] = []
+        data["name"] = []
+        for person in people:
+            print person
+            data["author"].append(person[0])
+            data["name"].append(person[1])
+        return data
+
 
