@@ -123,7 +123,15 @@ class SCM(object):
                 else:
                     aggregation[metric] = pandas.Series.nunique
 
-        return grouped.aggregate(aggregation)
+        result = grouped.aggregate(aggregation)
+
+        data = {}
+        metrics = result.columns.values.tolist()
+        for metric in metrics:
+            if metric == "date":
+                continue
+            data[metric] = list(result[metric])
+        return data
 
     def raw(self):
         """ This method returns the raw values of self.data in JSON format
