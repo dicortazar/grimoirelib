@@ -29,7 +29,7 @@ app = Flask(__name__)
 api = Api(app)
 
 
-scm_object = SCMData("root", "", "wikimedia_git_20150629")
+scm_object = SCMData("root", "", "wikimedia_git_20150629", "wikimedia_identities_20150621")
 scm_data = scm_object.get_data()
 
 #scr_object = SCRData()
@@ -52,6 +52,24 @@ class SCMTS(Resource):
     def get(self):
         return jsonify(ts=scm_data.ts(scm_data.PERIOD_MONTH, scm_data.metrics))
 
+## SCM List of elements
+
+class SCMPeople(Resource):
+    def get(self):
+        return scm_object.people()
+
+class SCMOrganizations(Resource):
+    def get(self):
+        return scm_object.organizations()
+
+class SCMRepositories(Resource):
+    def get(self):
+        return scm_object.repositories()
+
+class SCMCountries(Resource):
+    def get(self):
+        return scm_object.countries()
+
 
 ## SCR metrics
 class SCRMetrics(Resource):
@@ -67,10 +85,14 @@ class SCRAgg(Resource):
         return jsonify(agg=scr_data.agg(scr_data.metrics))
 
 
-api.add_resource(SCMMetrics, "/metrics/scm/")
-api.add_resource(SCMRaw, "/raw/scm/")
-api.add_resource(SCMAgg, "/agg/scm/")
-api.add_resource(SCMTS, "/ts/scm/")
+api.add_resource(SCMMetrics, "/scm/metrics/")
+api.add_resource(SCMRaw, "/scm/raw/")
+api.add_resource(SCMAgg, "/scm/agg/")
+api.add_resource(SCMTS, "/scm/ts/")
+api.add_resource(SCMPeople, "/scm/people/")
+api.add_resource(SCMOrganizations, "/scm/organizations/")
+api.add_resource(SCMRepositories, "/scm/repositories/")
+api.add_resource(SCMCountries, "/scm/countries/")
 
 
 api.add_resource(SCRMetrics, "/metrics/scr/")
