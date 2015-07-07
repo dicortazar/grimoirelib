@@ -53,7 +53,8 @@ class SCMData(object):
             return []
 
 
-    def __init__(self, user, password, database):
+    def __init__(self, user, password, database, identities):
+        self.identities = identities
         self.db, self.cursor = self._connect(user, password, database)
         query = """ SELECT column_name
                     FROM information_schema.columns
@@ -88,9 +89,20 @@ class SCMData(object):
         data["author"] = []
         data["name"] = []
         for person in people:
-            print person
             data["author"].append(person[0])
             data["name"].append(person[1])
         return data
 
-
+    def organizations(self):
+        query = """ SELECT id as company,
+                           name as name
+                    FROM %s.organizations
+                """ % (self.identities)
+        organizations = self._execute_query(self.cursor, query)
+        data = {}
+        data["organization"] = []
+        data["name"] = []
+        for org in organizations:
+            data["organization"].append(org[0])
+            data["name"].append(org[1])
+        return data
