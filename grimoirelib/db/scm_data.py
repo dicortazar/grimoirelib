@@ -106,3 +106,17 @@ class SCMData(object):
             data["organization"].append(org[0])
             data["name"].append(org[1])
         return data
+
+    def countries(self):
+        query = """ SELECT code as country,
+                           name as name
+                    FROM %s.countries
+                """ % (self.identities)
+        countries = self._execute_query(self.cursor, query)
+        data = {}
+        data["country"] = []
+        data["name"] = []
+        for country in countries:
+            data["country"].append(country[0])
+            data["name"].append(country[1])
+        return data
