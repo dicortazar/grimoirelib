@@ -71,8 +71,16 @@ class SCMCountries(Resource):
         return scm_object.countries()
 
 class SCMGroupsAgg(Resource):
+    def get(self, metric1):
+        return scm_data.group([metric1])
+
+class SCMDoubleGroupsAgg(Resource):
     def get(self, metric1, metric2):
         return scm_data.group([metric1, metric2])
+
+class SCMTripleGroupsAgg(Resource):
+    def get(self, metric1, metric2, metric3):
+        return scm_data.group([metric1, metric2, metric3])
 
 ## SCR metrics
 class SCRMetrics(Resource):
@@ -87,16 +95,26 @@ class SCRAgg(Resource):
     def get(self):
         return jsonify(agg=scr_data.agg(scr_data.metrics))
 
-
+# Basic approach and too heavy access. This should be probably
+# removed at some point.
 api.add_resource(SCMMetrics, "/scm/metrics/")
 api.add_resource(SCMRaw, "/scm/raw/")
 api.add_resource(SCMAgg, "/scm/agg/")
 api.add_resource(SCMTS, "/scm/ts/")
+
+# List of 'things' in the community. When values are returned at the
+# level of ts, raw or agg, those usually returns integer values for 
+# each column. That value has an actual name and can be retrieved
+# by calling these lists.
 api.add_resource(SCMPeople, "/scm/people/")
 api.add_resource(SCMOrganizations, "/scm/organizations/")
 api.add_resource(SCMRepositories, "/scm/repositories/")
 api.add_resource(SCMCountries, "/scm/countries/")
-api.add_resource(SCMGroupsAgg, "/scm/<metric1>/<metric2>/agg/")
+
+# Grouping calls.
+api.add_resource(SCMGroupsAgg, "/scm/<metric1>/agg/")
+api.add_resource(SCMDoubleGroupsAgg, "/scm/<metric1>/<metric2>/agg/")
+api.add_resource(SCMTripleGroupsAgg, "/scm/<metric1>/<metric2>/<metric3>/agg/")
 
 
 api.add_resource(SCRMetrics, "/metrics/scr/")
