@@ -120,3 +120,21 @@ class SCMData(object):
             data["country"].append(country[0])
             data["name"].append(country[1])
         return data
+
+    def repositories(self):
+        query = """ SELECT id as repository,
+                           uri as uri,
+                           name as name
+                    FROM repositories
+                """
+        repositories = self._execute_query(self.cursor, query)
+        data = {}
+        data["repository"] = []
+        data["uri"] = []
+        data["name"] = []
+        for repo in repositories:
+            data["repository"].append(repo[0])
+            data["uri"].append(repo[1])
+            data["name"].append(repo[2])
+        return data
+
