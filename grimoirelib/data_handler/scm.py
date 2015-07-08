@@ -55,9 +55,6 @@ class SCM(object):
 
         data = {}
         for metric in metrics:
-            print metric
-            print SCM.METRICS_SUM
-            print SCM.METRICS_BOOLEAN
             if metric in SCM.METRICS_SUM:
                 data[metric] = self.data[metric].sum()
             elif metric in SCM.METRICS_BOOLEAN:
@@ -95,6 +92,10 @@ class SCM(object):
         metrics = timeserie.columns.values.tolist()
         for metric in metrics:
             data[metric] = list(timeserie[metric])
+
+        data["date"] = []
+        for row in timeserie.itertuples():
+            data["date"].append(str(row[0]))
 
         return data
 
